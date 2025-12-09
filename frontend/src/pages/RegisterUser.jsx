@@ -31,7 +31,7 @@ export default function RegisterUser() {
     e.preventDefault();
     try {
       const res = await registerUser(form); // send plain JSON
-      console.log("Backend Response:", res.data);
+      console.log("Backend Responseed:", res.data);
       localStorage.setItem("isRegistered", "true");
       alert(res.data.msg || "User Registered Successfully!");     
       setForm({
