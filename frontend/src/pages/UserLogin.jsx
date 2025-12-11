@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import img from "../assets/adminlogin.png";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👈 Import eye icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
+import LoadingPage from "./LoadingPage";
 
 export default function UserLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 Password toggle
+  const [showPassword, setShowPassword] = useState(false);
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -17,20 +19,33 @@ export default function UserLogin() {
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
-    try {
-     const res = await axios.post("http://localhost:8000/api/login", {
-        email,
-        password,
-      });
-      setMsg("Login success!");
-      localStorage.setItem("token", res.data.token);
-      console.log(res.data);
-       navigate("/dashboard");
-        
-    } catch (error) {
-      setMsg("Invalid credentials");
-    }
+    setLoading(true);
+
+    // Show loader for 2 seconds
+    setTimeout(async () => {
+      try {
+        const res = await axios.post("http://localhost:8000/api/login", {
+          email,
+          password,
+        });
+
+        setMsg("Login success!");
+        localStorage.setItem("token", res.data.token);
+        console.log(res.data);
+
+        setLoading(false);
+        navigate("/dashboard");
+      } catch (error) {
+        setLoading(false);
+        setMsg("Invalid credentials");
+      }
+    }, 2000);
   };
+
+  // Show Loading Page
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   return (
     <div
@@ -69,7 +84,7 @@ export default function UserLogin() {
             <label className="form-label text-white">Password</label>
             <div style={{ position: "relative" }}>
               <input
-                type={showPassword ? "text" : "password"} // 👈 toggle type
+                type={showPassword ? "text" : "password"}
                 className="form-control"
                 placeholder="Enter password"
                 value={password}
